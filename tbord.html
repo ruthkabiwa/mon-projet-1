@@ -1,0 +1,313 @@
+ <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOVV - Tableau de Bord Inventaire</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="tableau.css">
+</head>
+<body>
+    
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-store"></i> DOVV</h3>
+            <p class="mb-0" style="font-size: 0.9rem; opacity: 0.8;">Gestion d'Inventaire</p>
+        </div>
+        
+        <div class="sidebar-menu">
+            <nav class="nav flex-column">
+                <a class="nav-link active" href="#dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+                </a>
+                <a class="nav-link" href="#inventory">
+                    <i class="fas fa-boxes"></i> Inventaire
+                </a>
+                <a class="nav-link" href="#products">
+                    <i class="fas fa-shopping-cart"></i> Produits
+                </a>
+                <a class="nav-link" href="#sales">
+                    <i class="fas fa-chart-line"></i> Ventes
+                </a>
+                <a class="nav-link" href="#suppliers">
+                    <i class="fas fa-truck"></i> Fournisseurs
+                </a>
+                <a class="nav-link" href="#reports">
+                    <i class="fas fa-file-alt"></i> Rapports
+                </a>
+                <a class="nav-link" href="#settings">
+                    <i class="fas fa-cog"></i> Parametres
+                </a>
+                <a class="nav-link" href="#logout">
+                    <i class="fas fa-sign-out-alt"></i> Deconnexion
+                </a>
+            </nav>
+        </div>
+    </div>
+
+   
+    <div class="main-content">
+       
+        <div class="header-bar">
+            <div>
+                <h4 class="mb-0">Tableau de Bord - Inventaire</h4>
+                <small class="text-muted">Supermarche DOVV</small>
+            </div>
+            <div>
+                <span class="badge bg-success">En ligne</span>
+                <span class="text-muted ms-3"><i class="fas fa-calendar"></i> <span id="currentDate"></span></span>
+            </div>
+        </div>
+
+        
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card success position-relative">
+                    <div class="stats-number text-success">2.847</div>
+                    <div class="stats-label">Total Produits</div>
+                    <i class="fas fa-boxes stats-icon"></i>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card warning position-relative">
+                    <div class="stats-number text-warning">45</div>
+                    <div class="stats-label">Stock Faible</div>
+                    <i class="fas fa-exclamation-triangle stats-icon"></i>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                    <div class="stats-number text-primary"> 1.250.000</div>
+                    <div class="stats-label">Ventes du Jour</div>
+                    <i class="fas fa-money-bill-wave stats-icon"></i>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card danger position-relative">
+                    <div class="stats-number text-danger">12</div>
+                    <div class="stats-label">Produits Expires</div>
+                    <i class="fas fa-times-circle stats-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+           
+            <div class="col-lg-8">
+                <div class="chart-container">
+                    <h5 class="mb-4"><i class="fas fa-chart-bar text-primary"></i> Ventes par Categorie</h5>
+                    <canvas id="salesChart" height="300"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <h5 class="mb-4"><i class="fas fa-chart-line text-success"></i> Evolution des Ventes (7 derniers jours)</h5>
+                    <canvas id="trendsChart" height="250"></canvas>
+                </div>
+            </div>
+
+            
+            <div class="col-lg-4">
+               
+                <div class="product-dropdown mb-4">
+                    <h5 class="mb-3"><i class="fas fa-list text-primary"></i> Catalogue Produits</h5>
+                    
+                    <div class="dropdown mb-3">
+                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-apple-alt"></i> Produits Alimentaires
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-bread-slice"></i> Boulangerie <span class="category-badge badge-alimentaire">235 items</span></a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cheese"></i> Produits Laitiers <span class="category-badge badge-alimentaire">189 items</span></a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-carrot"></i> Fruits & LEgumes <span class="category-badge badge-alimentaire">156 items</span></a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-drumstick-bite"></i> Viandes & Poissons <span class="category-badge badge-alimentaire">98 items</span></a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown mb-3">
+                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-wine-bottle"></i> Boissons
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-tint"></i> Eaux & Sodas <span class="category-badge badge-boissons">145 items</span></a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-wine-glass"></i> Vins & Spiritueux <span class="category-badge badge-boissons">87 items</span></a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-coffee"></i> Cafes & Thés <span class="category-badge badge-boissons">64 items</span></a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown mb-3">
+                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-pump-soap"></i> Hygiene & Beaute
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-soap"></i> Produits d'Hygiene <span class="category-badge badge-hygiene">76 items</span></a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-spray-can"></i> Cosmetiques <span class="category-badge badge-hygiene">54 items</span></a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-baby"></i> Produits Bebe <span class="category-badge badge-hygiene">43 items</span></a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-tshirt"></i> Textile & Accessoires
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-tshirt"></i> Vêtements <span class="category-badge badge-textile">32 items</span></a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-shoe-prints"></i> Chaussures <span class="category-badge badge-textile">28 items</span></a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-ring"></i> Accessoires <span class="category-badge badge-textile">19 items</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                
+                <div class="recent-activity">
+                    <h5 class="mb-3"><i class="fas fa-history text-primary"></i> Activite Recente</h5>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon success">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div>
+                            <strong>Nouveau stock recu</strong>
+                            <br><small class="text-muted">50 unites de Lait Fresh ajoutees</small>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon warning">
+                            <i class="fas fa-exclamation"></i>
+                        </div>
+                        <div>
+                            <strong>Stock faible detecte</strong>
+                            <br><small class="text-muted">Pain de mie : 5 unites restantes</small>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon danger">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        <div>
+                            <strong>Produit expire</strong>
+                            <br><small class="text-muted">Yaourt nature retire du stock</small>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon success">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div>
+                            <strong>Vente importante</strong>
+                            <br><small class="text-muted">Commande de  45.000 validee</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <script>
+        
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        
+        const salesCtx = document.getElementById('salesChart').getContext('2d');
+        new Chart(salesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Alimentaire', 'Boissons', 'Hygiène', 'Textile'],
+                datasets: [{
+                    data: [45, 25, 20, 10],
+                    backgroundColor: [
+                        '#27ae60',
+                        '#3498db',
+                        '#f39c12',
+                        '#9b59b6'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+
+        
+        const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+        new Chart(trendsCtx, {
+            type: 'line',
+            data: {
+                labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                datasets: [{
+                    label: 'Ventes ()',
+                    data: [850000, 920000, 780000, 1100000, 1250000, 1450000, 1180000],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '' + (value / 1000) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        
+        document.querySelectorAll('.sidebar-menu .nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar-menu .nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+       
+        setInterval(() => {
+            const statsNumbers = document.querySelectorAll('.stats-number');
+            statsNumbers.forEach(stat => {
+                if (stat.textContent.includes('₦')) {
+                    const currentValue = parseInt(stat.textContent.replace(/[,]/g, ''));
+                    const newValue = currentValue + Math.floor(Math.random() * 10000);
+                    stat.textContent = ' ' + newValue.toLocaleString();
+                }
+            });
+        }, 30000); 
+    </script>
+</body>
+</html>
