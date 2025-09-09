@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion d'Inventaire - VotreMarque</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+    
+    body {
+      background: #f4f6f9;
+    }
+    header {
+      background: #343a40;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .low-stock {
+      color: red;
+      font-weight: bold;
+    }
+    .alert-zone {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header avec déconnexion -->
+  <header>
+    <h4>📦 Gestion d'Inventaire</h4>
+    <button class="btn btn-danger btn-sm" onclick="logout()">Déconnexion</button>
+  </header>
+
+  <div class="container py-4">
+    <!-- Zone d’alerte -->
+    <div id="alertZone" class="alert-zone"></div>
+
+    <!-- Formulaire d'ajout -->
+    <div class="card mb-4">
+      <div class="card-header">Ajouter / Modifier un produit</div>
+      <div class="card-body">
+        <form id="productForm">
+          <input type="hidden" id="editIndex">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <input type="text" id="name" class="form-control" placeholder="Nom du produit" required>
+            </div>
+            <div class="col-md-3">
+              <input type="number" id="quantity" class="form-control" placeholder="Quantité" required>
+            </div>
+            <div class="col-md-3">
+              <input type="number" id="threshold" class="form-control" placeholder="Seuil minimum" required>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-success w-100">Enregistrer</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tableau des produits -->
+    <div class="card">
+      <div class="card-header">Liste des Produits</div>
+      <div class="card-body">
+        <table class="table table-bordered table-striped text-center" id="inventoryTable">
+          <thead class="table-dark">
+            <tr>
+              <th>Nom</th>
+              <th>Quantité</th>
+              <th>Seuil</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let products = [];
+
+  // Charger les produits depuis localStorage
+  function loadProducts() {
+    const stored = localStorage.getItem("products");
+    if (stored) {
+      products = JSON.parse(stored);
+    }
+    renderTable();
+  }
+
+  // Sauvegarder les produits dans localStorage
+  function saveProducts() {
+    localStorage.setItem("products", JSON.stringify(products));
+  }
+
+  function renderTable() {
+    const tbody = document.querySelector("#inventoryTable tbody");
+    tbody.innerHTML = "";
+    let alerts = [];
+
+    products.forEach((product, index) => {
+      const tr = document.createElement("tr");
+
+      // Vérifier le stock
+      let status = "✅ OK";
+      if (product.quantity <= product.threshold) {
+        status = `<span class="low-stock">⚠ Stock bas</span>`;
+        alerts.push(`Le produit <b>${product.name}</b> est presque en rupture (Qté : ${product.quantity})`);
+      }
+
+      tr.innerHTML = `
+        <td>${product.name}</td>
+        <td>${product.quantity}</td>
+        <td>${product.threshold}</td>
+        <td>${status}</td>
+        <td>
+          <button class="btn btn-warning btn-sm" onclick="editProduct(${index})">Modifier</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct(${index})">Supprimer</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Afficher les alertes globales
+    const alertZone = document.getElementById("alertZone");
+    if (alerts.length > 0) {
+      alertZone.innerHTML = `<div class="alert alert-danger"><strong>⚠ Attention :</strong><br>${alerts.join("<br>")}</div>`;
+    } else {
+      alertZone.innerHTML = "";
+    }
+
+    saveProducts(); // Sauvegarder après chaque rendu
+  }
+
+  document.querySelector("#productForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const name = document.getElementById("name").value;
+    const quantity = parseInt(document.getElementById("quantity").value);
+    const threshold = parseInt(document.getElementById("threshold").value);
+    const editIndex = document.getElementById("editIndex").value;
+
+    if (editIndex === "") {
+      products.push({ name, quantity, threshold });
+    } else {
+      products[editIndex] = { name, quantity, threshold };
+      document.getElementById("editIndex").value = "";
+    }
+
+    this.reset();
+    renderTable();
+  });
+
+  function deleteProduct(index) {
+    if (confirm("Voulez-vous vraiment supprimer ce produit ?")) {
+      products.splice(index, 1);
+      renderTable();
+    }
+  }
+
+  function editProduct(index) {
+    const product = products[index];
+    document.getElementById("name").value = product.name;
+    document.getElementById("quantity").value = product.quantity;
+    document.getElementById("threshold").value = product.threshold;
+    document.getElementById("editIndex").value = index;
+  }
+
+  function logout() {
+    alert("Vous êtes déconnecté !");
+    window.location.href = "login.html"; // Redirection vers une page de connexion
+  }
+
+  // Charger au démarrage
+  window.onload = loadProducts;
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmsorigin="anonymous"></script>
+</body>
+</html>

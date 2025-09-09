@@ -56,6 +56,7 @@
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
         }
 
+
         .nav {
             max-width: 1200px;
             margin: 0 auto;
@@ -97,6 +98,14 @@
         .nav-link:hover {
             color: #ff9500;
             background: rgba(255, 149, 0, 0.1);
+        }
+        .nav-link.signup {
+            background: #ff6b35;
+            color: white !important;
+            border-radius: 25px;
+            padding: 0.7rem 1.5rem;
+            transition: all 0.3s ease;
+            margin-left: 0.5rem;
         }
 
         .nav-link.cta {

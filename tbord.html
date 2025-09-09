@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -6,199 +6,726 @@
     <title>DOVV - Tableau de Bord Inventaire</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="tableau.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --sidebar-width: 250px;
+            --header-height: 70px;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .sidebar-header h3 {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 25px;
+            margin: 2px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-menu .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .sidebar-menu .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        
+        .header-bar {
+            background: white;
+            height: var(--header-height);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-bar h4 {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .content-wrapper {
+            padding: 30px;
+        }
+
+        
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: none;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--info-color);
+        }
+
+        .stats-card.success::before {
+            background: var(--success-color);
+        }
+
+        .stats-card.warning::before {
+            background: var(--warning-color);
+        }
+
+        .stats-card.danger::before {
+            background: var(--danger-color);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stats-label {
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .stats-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        
+        .category-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .category-section h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .category-dropdown {
+            margin-bottom: 15px;
+        }
+
+        .category-dropdown .btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: var(--primary-color);
+            font-weight: 500;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-align: left;
+            position: relative;
+        }
+
+        .category-dropdown .btn:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 10px;
+            padding: 10px 0;
+        }
+
+        .dropdown-item {
+            padding: 10px 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: var(--primary-color);
+        }
+
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 16px;
+        }
+
+        .category-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .badge-alimentaire {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .badge-boissons {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--info-color);
+        }
+
+        .badge-hygiene {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+
+        .badge-textile {
+            background-color: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+
+        
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.success {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .activity-icon.warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+
+        .activity-icon.danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+
+        .activity-content strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .activity-content small {
+            color: #6c757d;
+        }
+
+        
+         (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-wrapper {
+                padding: 20px 15px;
+            }
+
+            .header-bar {
+                padding: 0 15px;
+            }
+        }
+
+        
+        .quick-stats {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .stat-item .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-item .label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+         pulse {
+            0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+        }
+    </style>
 </head>
 <body>
     
     <div class="sidebar">
         <div class="sidebar-header">
             <h3><i class="fas fa-store"></i> DOVV</h3>
-            <p class="mb-0" style="font-size: 0.9rem; opacity: 0.8;">Gestion d'Inventaire</p>
+            <p class="mb-0">Gestion d'Inventaire</p>
         </div>
         
         <div class="sidebar-menu">
             <nav class="nav flex-column">
-                <a class="nav-link active" href="#dashboard">
+                <a class="nav-link active" href="#dashboard" data-section="dashboard">
                     <i class="fas fa-tachometer-alt"></i> Tableau de Bord
                 </a>
-                <a class="nav-link" href="#inventory">
+                <a class="nav-link" href="#inventory" data-section="inventory">
                     <i class="fas fa-boxes"></i> Inventaire
                 </a>
-                <a class="nav-link" href="#products">
+                <a class="nav-link" href="#products" data-section="products">
                     <i class="fas fa-shopping-cart"></i> Produits
                 </a>
-                <a class="nav-link" href="#sales">
+                <a class="nav-link" href="#sales" data-section="sales">
                     <i class="fas fa-chart-line"></i> Ventes
                 </a>
-                <a class="nav-link" href="#suppliers">
+                <a class="nav-link" href="#suppliers" data-section="suppliers">
                     <i class="fas fa-truck"></i> Fournisseurs
                 </a>
-                <a class="nav-link" href="#reports">
+                <a class="nav-link" href="#reports" data-section="reports">
                     <i class="fas fa-file-alt"></i> Rapports
                 </a>
-                <a class="nav-link" href="#settings">
-                    <i class="fas fa-cog"></i> Parametres
+                <a class="nav-link" href="#settings" data-section="settings">
+                    <i class="fas fa-cog"></i> Paramètres
                 </a>
-                <a class="nav-link" href="#logout">
-                    <i class="fas fa-sign-out-alt"></i> Deconnexion
+                <a class="nav-link" href="#logout" data-section="logout">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
                 </a>
             </nav>
         </div>
     </div>
 
-   
+    
     <div class="main-content">
-       
+        
         <div class="header-bar">
             <div>
                 <h4 class="mb-0">Tableau de Bord - Inventaire</h4>
                 <small class="text-muted">Supermarche DOVV</small>
             </div>
-            <div>
-                <span class="badge bg-success">En ligne</span>
-                <span class="text-muted ms-3"><i class="fas fa-calendar"></i> <span id="currentDate"></span></span>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-success me-3 pulse">En ligne</span>
+                <span class="text-muted">
+                    <i class="fas fa-calendar me-2"></i>
+                    <span id="currentDate"></span>
+                </span>
             </div>
         </div>
 
-        
-        <div class="row">
-            <div class="col-lg-3 col-md-6">
-                <div class="stats-card success position-relative">
-                    <div class="stats-number text-success">2.847</div>
-                    <div class="stats-label">Total Produits</div>
-                    <i class="fas fa-boxes stats-icon"></i>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="stats-card warning position-relative">
-                    <div class="stats-number text-warning">45</div>
-                    <div class="stats-label">Stock Faible</div>
-                    <i class="fas fa-exclamation-triangle stats-icon"></i>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                    <div class="stats-number text-primary"> 1.250.000</div>
-                    <div class="stats-label">Ventes du Jour</div>
-                    <i class="fas fa-money-bill-wave stats-icon"></i>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="stats-card danger position-relative">
-                    <div class="stats-number text-danger">12</div>
-                    <div class="stats-label">Produits Expires</div>
-                    <i class="fas fa-times-circle stats-icon"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-           
-            <div class="col-lg-8">
-                <div class="chart-container">
-                    <h5 class="mb-4"><i class="fas fa-chart-bar text-primary"></i> Ventes par Categorie</h5>
-                    <canvas id="salesChart" height="300"></canvas>
-                </div>
-                
-                <div class="chart-container">
-                    <h5 class="mb-4"><i class="fas fa-chart-line text-success"></i> Evolution des Ventes (7 derniers jours)</h5>
-                    <canvas id="trendsChart" height="250"></canvas>
-                </div>
-            </div>
-
+       
+        <div class="content-wrapper">
             
-            <div class="col-lg-4">
+            <div class="row mb-4 fade-in">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card success">
+                        <div class="stats-number text-success">2.878</div>
+                        <div class="stats-label">Total Produits</div>
+                        <i class="fas fa-boxes stats-icon"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card warning">
+                        <div class="stats-number text-warning">45</div>
+                        <div class="stats-label">Stock Faible</div>
+                        <i class="fas fa-exclamation-triangle stats-icon"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-number text-primary" id="dailySales">1.250.000</div>
+                        <div class="stats-label">Ventes du Jour</div>
+                        <i class="fas fa-money-bill-wave stats-icon"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card danger">
+                        <div class="stats-number text-danger">12</div>
+                        <div class="stats-label">Produits Expirés</div>
+                        <i class="fas fa-times-circle stats-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
                
-                <div class="product-dropdown mb-4">
-                    <h5 class="mb-3"><i class="fas fa-list text-primary"></i> Catalogue Produits</h5>
+                <div class="col-lg-8">
+                    <div class="quick-stats fade-in">
+                        <h5 class="mb-4">
+                            <i class="fas fa-chart-bar text-primary me-2"></i>
+                            Aperçu Rapide des Ventes
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-3 col-6">
+                                <div class="stat-item">
+                                    <div class="number text-success">45%</div>
+                                    <div class="label">Alimentaire</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="stat-item">
+                                    <div class="number text-info">25%</div>
+                                    <div class="label">Boissons</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="stat-item">
+                                    <div class="number text-warning">20%</div>
+                                    <div class="label">Hygiène</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="stat-item">
+                                    <div class="number" style="color: #9b59b6;">10%</div>
+                                    <div class="label">Textile</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     
-                    <div class="dropdown mb-3">
-                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-apple-alt"></i> Produits Alimentaires
-                        </button>
-                        <ul class="dropdown-menu w-100">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-bread-slice"></i> Boulangerie <span class="category-badge badge-alimentaire">235 items</span></a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cheese"></i> Produits Laitiers <span class="category-badge badge-alimentaire">189 items</span></a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-carrot"></i> Fruits & LEgumes <span class="category-badge badge-alimentaire">156 items</span></a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-drumstick-bite"></i> Viandes & Poissons <span class="category-badge badge-alimentaire">98 items</span></a></li>
-                        </ul>
-                    </div>
-
-                    <div class="dropdown mb-3">
-                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-wine-bottle"></i> Boissons
-                        </button>
-                        <ul class="dropdown-menu w-100">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-tint"></i> Eaux & Sodas <span class="category-badge badge-boissons">145 items</span></a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-wine-glass"></i> Vins & Spiritueux <span class="category-badge badge-boissons">87 items</span></a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-coffee"></i> Cafes & Thés <span class="category-badge badge-boissons">64 items</span></a></li>
-                        </ul>
-                    </div>
-
-                    <div class="dropdown mb-3">
-                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-pump-soap"></i> Hygiene & Beaute
-                        </button>
-                        <ul class="dropdown-menu w-100">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-soap"></i> Produits d'Hygiene <span class="category-badge badge-hygiene">76 items</span></a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-spray-can"></i> Cosmetiques <span class="category-badge badge-hygiene">54 items</span></a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-baby"></i> Produits Bebe <span class="category-badge badge-hygiene">43 items</span></a></li>
-                        </ul>
-                    </div>
-
-                    <div class="dropdown">
-                        <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-tshirt"></i> Textile & Accessoires
-                        </button>
-                        <ul class="dropdown-menu w-100">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-tshirt"></i> Vêtements <span class="category-badge badge-textile">32 items</span></a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-shoe-prints"></i> Chaussures <span class="category-badge badge-textile">28 items</span></a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-ring"></i> Accessoires <span class="category-badge badge-textile">19 items</span></a></li>
-                        </ul>
+                    <div class="quick-stats fade-in">
+                        <h5 class="mb-4">
+                            <i class="fas fa-chart-line text-success me-2"></i>
+                            Ventes de la Semaine
+                        </h5>
+                        <div class="row">
+                            <div class="col">
+                                <div class="stat-item">
+                                    <div class="number text-muted">850 stockes</div>
+                                    <div class="label">Lundi</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-item">
+                                    <div class="number text-muted">920 stockes</div>
+                                    <div class="label">Mardi</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-item">
+                                    <div class="number text-muted"> 780 stockes</div>
+                                    <div class="label">Mercredi</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-item">
+                                    <div class="number text-success"> 900 stockes</div>
+                                    <div class="label">Jeudi</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-item">
+                                    <div class="number text-primary"> 150 stockes</div>
+                                    <div class="label">Vendredi</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-item">
+                                    <div class="number text-success"> 200 stockes</div>
+                                    <div class="label">Samedi</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-item">
+                                    <div class="number text-info"> 170 stockes</div>
+                                    <div class="label">Dimanche</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                
-                <div class="recent-activity">
-                    <h5 class="mb-3"><i class="fas fa-history text-primary"></i> Activite Recente</h5>
+               
+                <div class="col-lg-4">
                     
-                    <div class="activity-item">
-                        <div class="activity-icon success">
-                            <i class="fas fa-plus"></i>
+                    <div class="category-section fade-in">
+                        <h5><i class="fas fa-list text-primary me-2"></i>Catalogue Produits</h5>
+                        
+                        <div class="category-dropdown">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-apple-alt me-2"></i>Produits Alimentaires
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-bread-slice"></i> Boulangerie</span>
+                                            <span class="category-badge badge-alimentaire">235 produits</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-cheese"></i> Produits Laitiers</span>
+                                            <span class="category-badge badge-alimentaire">189 produits</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-carrot"></i> Fruits & Légumes</span>
+                                            <span class="category-badge badge-alimentaire">156 produits</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-drumstick-bite"></i> Viandes & Poissons</span>
+                                            <span class="category-badge badge-alimentaire">98 produits</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <div>
-                            <strong>Nouveau stock recu</strong>
-                            <br><small class="text-muted">50 unites de Lait Fresh ajoutees</small>
+
+                        <div class="category-dropdown">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-wine-bottle me-2"></i>Boissons
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-tint"></i> Eaux & Sodas</span>
+                                            <span class="category-badge badge-boissons">145 produts</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-wine-glass"></i> Vins & Spiritueux</span>
+                                            <span class="category-badge badge-boissons">87 produits</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-coffee"></i> Cafés & Thés</span>
+                                            <span class="category-badge badge-boissons">64 produits</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="category-dropdown">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-pump-soap me-2"></i>Hygiène & Beauté
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-soap"></i> Produits d'Hygiène</span>
+                                            <span class="category-badge badge-hygiene">76 produits</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-spray-can"></i> Cosmétiques</span>
+                                            <span class="category-badge badge-hygiene">54 produits</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-baby"></i> Produits Bébé</span>
+                                            <span class="category-badge badge-hygiene">43 produits</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="category-dropdown">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-tshirt me-2"></i>Textile & Accessoires
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-tshirt"></i> Vêtements</span>
+                                            <span class="category-badge badge-textile">32 produits</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-shoe-prints"></i> Chaussures</span>
+                                            <span class="category-badge badge-textile">28 produits</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <span><i class="fas fa-ring"></i> Accessoires</span>
+                                            <span class="category-badge badge-textile">19 produits</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="activity-item">
-                        <div class="activity-icon warning">
-                            <i class="fas fa-exclamation"></i>
+                   
+                    <div class="category-section fade-in">
+                        <h5><i class="fas fa-history text-primary me-2"></i>Activité Récente</h5>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon success">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="activity-content">
+                                <strong>Nouveau stock reçu</strong><br>
+                                <small>50 unités de Lait Fresh ajoutées</small>
+                            </div>
                         </div>
-                        <div>
-                            <strong>Stock faible detecte</strong>
-                            <br><small class="text-muted">Pain de mie : 5 unites restantes</small>
-                        </div>
-                    </div>
 
-                    <div class="activity-item">
-                        <div class="activity-icon danger">
-                            <i class="fas fa-times"></i>
+                        <div class="activity-item">
+                            <div class="activity-icon warning">
+                                <i class="fas fa-exclamation"></i>
+                            </div>
+                            <div class="activity-content">
+                                <strong>Stock faible détecté</strong><br>
+                                <small>Pain de mie : 5 unités restantes</small>
+                            </div>
                         </div>
-                        <div>
-                            <strong>Produit expire</strong>
-                            <br><small class="text-muted">Yaourt nature retire du stock</small>
-                        </div>
-                    </div>
 
-                    <div class="activity-item">
-                        <div class="activity-icon success">
-                            <i class="fas fa-shopping-cart"></i>
+                        <div class="activity-item">
+                            <div class="activity-icon danger">
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="activity-content">
+                                <strong>Produit expiré</strong><br>
+                                <small>Yaourt nature retiré du stock</small>
+                            </div>
                         </div>
-                        <div>
-                            <strong>Vente importante</strong>
-                            <br><small class="text-muted">Commande de  45.000 validee</small>
+
+                        <div class="activity-item">
+                            <div class="activity-icon success">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="activity-content">
+                                <strong>Vente importante</strong><br>
+                                <small>Commande de 45,000 validée</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -206,108 +733,340 @@
         </div>
     </div>
 
-    
+   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     
     <script>
-        
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+        // Mise à jour de la date actuelle
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('fr-FR', options);
+        }
 
-        
-        const salesCtx = document.getElementById('salesChart').getContext('2d');
-        new Chart(salesCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Alimentaire', 'Boissons', 'Hygiène', 'Textile'],
-                datasets: [{
-                    data: [45, 25, 20, 10],
-                    backgroundColor: [
-                        '#27ae60',
-                        '#3498db',
-                        '#f39c12',
-                        '#9b59b6'
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true
-                        }
+        // Navigation dans la sidebar
+        function setupSidebarNavigation() {
+            const navLinks = document.querySelectorAll('.sidebar-menu .nav-link');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Retirer la classe active de tous les liens
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Ajouter la classe active au lien cliqué
+                    this.classList.add('active');
+                    
+                    // Animation de clic
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+        }
+
+        // Simulation des ventes en temps réel
+        function simulateLiveSales() {
+            const dailySalesElement = document.getElementById('dailySales');
+            
+            setInterval(() => {
+                // Obtenir la valeur actuelle
+                const currentText = dailySalesElement.textContent;
+                const currentValue = parseInt(currentText.replace(/[^\d]/g, ''));
+                
+                // Calculer une nouvelle valeur (augmentation aléatoire)
+                const increase = Math.floor(Math.random() * 15000) + 5000;
+                const newValue = currentValue + increase;
+                
+                // Mettre à jour avec animation
+                dailySalesElement.style.transform = 'scale(1.1)';
+                dailySalesElement.style.color = '#27ae60';
+                
+                setTimeout(() => {
+                    dailySalesElement.textContent = `₦ ${newValue.toLocaleString()}`;
+                    dailySalesElement.style.transform = 'scale(1)';
+                    
+                    setTimeout(() => {
+                        dailySalesElement.style.color = '';
+                    }, 500);
+                }, 200);
+                
+            }, 30000); // Mise à jour toutes les 30 secondes
+        }
+
+        // Animation d'entrée pour les éléments
+        function setupAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
                     }
+                });
+            });
+
+            // Observer tous les éléments avec la classe fade-in
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'all 0.6s ease';
+                observer.observe(el);
+            });
+        }
+
+        // Animation au survol des cartes statistiques
+        function setupStatsCardAnimations() {
+            const statsCards = document.querySelectorAll('.stats-card');
+            
+            statsCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        }
+
+        // Gestion des dropdowns avec animations
+        function setupDropdownAnimations() {
+            const dropdownButtons = document.querySelectorAll('.category-dropdown .btn');
+            
+            dropdownButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Animation de rotation de l'icône
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        icon.style.transition = 'transform 0.3s ease';
+                        icon.style.transform = 'rotate(180deg)';
+                        
+                        setTimeout(() => {
+                            icon.style.transform = 'rotate(0deg)';
+                        }, 300);
+                    }
+                });
+            });
+        }
+
+        // Notification système
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = `
+                top: 90px;
+                right: 30px;
+                z-index: 1050;
+                min-width: 300px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                border-radius: 10px;
+                border: none;
+            `;
+            
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove après 5 secondes
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
                 }
-            }
-        });
+            }, 5000);
+        }
 
-        
-        const trendsCtx = document.getElementById('trendsChart').getContext('2d');
-        new Chart(trendsCtx, {
-            type: 'line',
-            data: {
-                labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-                datasets: [{
-                    label: 'Ventes ()',
-                    data: [850000, 920000, 780000, 1100000, 1250000, 1450000, 1180000],
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
+        // Simulation d'activité en temps réel
+        function simulateRealTimeActivity() {
+            const activities = [
+                {
+                    type: 'success',
+                    icon: 'fas fa-plus',
+                    title: 'Nouveau stock reçu',
+                    message: 'Coca-Cola 1.5L : 120 unités ajoutées'
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '' + (value / 1000) + 'k';
-                            }
-                        }
-                    }
+                {
+                    type: 'warning',
+                    icon: 'fas fa-exclamation',
+                    title: 'Stock faible',
+                    message: 'Savon Lux : 8 unités restantes'
+                },
+                {
+                    type: 'success',
+                    icon: 'fas fa-shopping-cart',
+                    title: 'Vente réalisée',
+                    message: 'Facture #1247 : ₦ 23,500'
+                },
+                {
+                    type: 'danger',
+                    icon: 'fas fa-times',
+                    title: 'Produit retiré',
+                    message: 'Biscuits Oreo expirés retirés'
                 }
+            ];
+
+            setInterval(() => {
+                const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+                
+                // Afficher une notification
+                showNotification(`<strong>${randomActivity.title}</strong><br><small>${randomActivity.message}</small>`, randomActivity.type);
+                
+                // Ajouter l'activité en haut de la liste
+                const activityContainer = document.querySelector('.category-section:last-child');
+                const firstActivity = activityContainer.querySelector('.activity-item');
+                
+                const newActivity = document.createElement('div');
+                newActivity.className = 'activity-item';
+                newActivity.style.opacity = '0';
+                newActivity.innerHTML = `
+                    <div class="activity-icon ${randomActivity.type}">
+                        <i class="${randomActivity.icon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <strong>${randomActivity.title}</strong><br>
+                        <small>${randomActivity.message}</small>
+                    </div>
+                `;
+                
+                activityContainer.insertBefore(newActivity, firstActivity);
+                
+                // Animation d'apparition
+                setTimeout(() => {
+                    newActivity.style.transition = 'opacity 0.5s ease';
+                    newActivity.style.opacity = '1';
+                }, 100);
+                
+                // Limiter à 6 activités maximum
+                const allActivities = activityContainer.querySelectorAll('.activity-item');
+                if (allActivities.length > 6) {
+                    allActivities[allActivities.length - 1].remove();
+                }
+                
+            }, Math.random() * 60000 + 30000); // Entre 30s et 1min30
+        }
+
+        // Mise à jour des statistiques
+        function updateStatistics() {
+            const stats = [
+                { selector: '.stats-card.success .stats-number', min: 2800, max: 2900 },
+                { selector: '.stats-card.warning .stats-number', min: 40, max: 60 },
+                { selector: '.stats-card.danger .stats-number', min: 8, max: 18 }
+            ];
+
+            stats.forEach(stat => {
+                const element = document.querySelector(stat.selector);
+                if (element && !element.textContent.includes('.')) {
+                    const newValue = Math.floor(Math.random() * (stat.max - stat.min) + stat.min);
+                    
+                    // Animation de changement
+                    element.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        element.textContent = newValue.toLocaleString();
+                        element.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            });
+        }
+
+        // Gestion du responsive - Toggle sidebar sur mobile
+        function setupMobileToggle() {
+            // Créer un bouton toggle pour mobile
+            const toggleButton = document.createElement('button');
+            toggleButton.className = 'btn btn-primary d-md-none position-fixed';
+            toggleButton.style.cssText = `
+                top: 15px;
+                left: 15px;
+                z-index: 1100;
+                border-radius: 50%;
+                width: 45px;
+                height: 45px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            `;
+            toggleButton.innerHTML = '<i class="fas fa-bars"></i>';
+            
+            document.body.appendChild(toggleButton);
+            
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            toggleButton.addEventListener('click', function() {
+                sidebar.style.transform = sidebar.style.transform === 'translateX(0px)' ? 
+                    'translateX(-100%)' : 'translateX(0px)';
+            });
+            
+            // Fermer la sidebar en cliquant sur le contenu principal sur mobile
+            mainContent.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                }
+            });
+        }
+
+        // Sauvegarde des préférences utilisateur
+        function saveUserPreferences() {
+            const activeNavItem = document.querySelector('.sidebar-menu .nav-link.active');
+            if (activeNavItem) {
+                const section = activeNavItem.getAttribute('data-section');
+                // En production, ceci serait sauvegardé en base de données
+                console.log('Section active sauvegardée:', section);
             }
-        });
+        }
 
+        // Initialisation de l'application
+        function initializeApp() {
+            console.log('🚀 Initialisation du tableau de bord DOVV...');
+            
+            // Initialiser toutes les fonctionnalités
+            updateCurrentDate();
+            setupSidebarNavigation();
+            setupAnimations();
+            setupStatsCardAnimations();
+            setupDropdownAnimations();
+            setupMobileToggle();
+            
+            // Démarrer les simulations
+            simulateLiveSales();
+            simulateRealTimeActivity();
+            
+            // Mettre à jour les statistiques toutes les 2 minutes
+            setInterval(updateStatistics, 120000);
+            
+            // Sauvegarder les préférences à la fermeture
+            window.addEventListener('beforeunload', saveUserPreferences);
+            
+            // Afficher un message de bienvenue
+            setTimeout(() => {
+                showNotification(
+                    '<strong>Bienvenue sur DOVV!</strong><br><small>Tableau de bord chargé avec succès</small>', 
+                    'success'
+                );
+            }, 1000);
+            
+            console.log('✅ Tableau de bord DOVV initialisé avec succès!');
+        }
+
+        // Démarrer l'application quand le DOM est chargé
+        document.addEventListener('DOMContentLoaded', initializeApp);
         
-        document.querySelectorAll('.sidebar-menu .nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.querySelectorAll('.sidebar-menu .nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            });
+        // Gestion des erreurs globales
+        window.addEventListener('error', function(e) {
+            console.error('Erreur dans l\'application:', e.error);
+            showNotification(
+                '<strong>Erreur système</strong><br><small>Une erreur est survenue. Veuillez rafraîchir la page.</small>', 
+                'danger'
+            );
         });
-
-       
-        setInterval(() => {
-            const statsNumbers = document.querySelectorAll('.stats-number');
-            statsNumbers.forEach(stat => {
-                if (stat.textContent.includes('₦')) {
-                    const currentValue = parseInt(stat.textContent.replace(/[,]/g, ''));
-                    const newValue = currentValue + Math.floor(Math.random() * 10000);
-                    stat.textContent = ' ' + newValue.toLocaleString();
-                }
-            });
-        }, 30000); 
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmsorigin="anonymous"></script>
 </body>
 </html>
